@@ -15,8 +15,6 @@ export async function GET(request: NextRequest) {
   const admin = await requireAdmin();
   if (!admin) return unauthorized();
 
-  console.log(request)
-
   try {
     const students = await prisma.student.findMany({
       orderBy: { createdAt: 'desc' },

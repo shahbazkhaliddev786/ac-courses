@@ -13,14 +13,15 @@ import { Prisma } from '@/src/generated/client';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const admin = await requireAdmin();
   if (!admin) return unauthorized();
 
   try {
     const student = await prisma.student.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!student) return notFound();
@@ -34,8 +35,9 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const {id} = await params;
   const admin = await requireAdmin();
   if (!admin) return unauthorized();
 
@@ -48,7 +50,7 @@ export async function PATCH(
     }
 
     const existing = await prisma.student.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existing) return notFound();
@@ -64,7 +66,7 @@ export async function PATCH(
               ? { rollNo: parsed.data.rollNo }
               : {},
           ],
-          NOT: { id: params.id },
+          NOT: { id },
         },
       });
 
@@ -74,7 +76,7 @@ export async function PATCH(
     }
 
     const updated = await prisma.student.update({
-      where: { id: params.id },
+      where: { id},
       data: parsed.data,
     });
 
@@ -94,19 +96,20 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const {id} = await params;
   const admin = await requireAdmin();
   if (!admin) return unauthorized();
 
   try {
     const existing = await prisma.student.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existing) return notFound();
 
-    await prisma.student.delete({ where: { id: params.id } });
+    await prisma.student.delete({ where: { id } });
 
     return successResponse(null, 'Student deleted successfully');
   } catch (error) {
