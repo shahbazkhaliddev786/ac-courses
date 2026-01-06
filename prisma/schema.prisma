@@ -1,0 +1,121 @@
+
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Admin users (seeded manually)
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  courses     Course[]
+
+  @@map("categories")
+}
+
+// Available courses
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+  @@map("courses")
+}
+
+model Student {
+  id                        String              @id @default(uuid())
+
+  // Personal Information
+  fullName                  String
+  fatherName                String
+  dateOfBirth               DateTime
+  cnic                      String              @unique
+  photoUrl                  String?
+  email                     String              @unique
+  contactNo                 String
+  country                   String              @default("Pakistan")
+  city                      String
+  address                   String
+
+  // Education Background
+  academicQualification     String?
+  professionalQualification String?
+  experience                String?             
+
+  // Course Selection (from registration form)
+  courseTitle               String
+  session                   String 
+  modeOfStudy               ModeOfStudy
+  duration                  CourseDuration
+
+  // Payment (optional)
+  depositAmount             Decimal?
+  bankNameAndBranchCode     String?             
+  depositDetails            String?
+
+  // Result Fields (filled by admin later)
+  registrationNo            String?             @unique     // e.g., "EDULRN/PDA-0572/2026"
+  rollNo                    String?             @unique     // e.g., "83015" from image
+  totalMarks                Int?
+  obtainedMarks             Int?
+  grade                     String?             
+
+  // Status
+  status                    RegistrationStatus  @default(PENDING)
+
+  createdAt                 DateTime            @default(now())
+  updatedAt                 DateTime            @updatedAt
+
+  @@index([cnic])
+  @@index([email])
+  @@index([rollNo])
+  @@index([registrationNo])
+  @@index([status])
+  @@map("students")
+}
+
+// Enums
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum ModeOfStudy {
+  REGULAR       // Theory + Practical
+  RPL           // Experience Based
+  DISTANCE      // Assignment Based
+}
+
+enum CourseDuration {
+  SIX_MONTHS
+  ONE_YEAR
+  TWO_YEARS
+}
+
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

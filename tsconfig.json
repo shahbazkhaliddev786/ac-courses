@@ -11,6 +11,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noImplicitAny":true,
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
@@ -22,6 +23,12 @@
       "@/*": ["./*"]
     }
   },
+  "eslintConfig": {
+    "rules": {
+      "@typescript-eslint/no-explicit-any": "error"
+    }
+  }
+  ,
   "include": [
     "next-env.d.ts",
     "**/*.ts",
@@ -29,6 +36,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "prisma/seed.ts"  ],
   "exclude": ["node_modules"]
 }
